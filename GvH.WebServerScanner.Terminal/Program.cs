@@ -8,6 +8,12 @@ namespace GvH.WebServerScanner.Terminal
         static void Main(string[] args)
         {
             Console.WriteLine("Hello, World!");
+
+
+            //TODO: Load a range from the params
+            //TODO: DI
+            //TODO: Logging
+            
             var res = new ScanRunner().PollIpAddress(new IpAddressRepresentation("192.168.1.1"), new List<HttpScanParameter>() { new HttpScanParameter() { Port = 80 } });
             
             Console.WriteLine($"{res.IpAddress.GetRepresentation()} ({res.HostName}): Online -> {res.Pingable} - {res.PingMs}ms");
