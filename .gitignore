@@ -1,0 +1,9 @@
+GvH.WebServerScanner.Application/obj/
+.vs/
+GvH.WebServerScanner.Library/bin/
+GvH.WebServerScanner.Library/obj/
+GvH.WebServerScanner.Tests/bin/
+GvH.WebServerScanner.Tests/obj/
+GvH.WebServerScanner.Application/bin/
+GvH.WebServerScanner.Terminal/obj/
+GvH.WebServerScanner.Terminal/bin/
