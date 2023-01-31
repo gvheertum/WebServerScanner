@@ -29,7 +29,7 @@ namespace GvH.WebServerScanner.Library
                 return null;
             }
         }
-
+//TODO: If no ping do not directly go for the HTTP, this should be a flag!!
         private string GetHostName(IpAddressRepresentation ip)
         {
             try

@@ -19,7 +19,7 @@
           <object class="GtkLabel" id="_label1">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Hello World!</property>
+            <property name="label" translatable="yes">Press Scan for Scan!</property>
           </object>
           <packing>
             <property name="expand">True</property>
@@ -28,16 +28,28 @@
           </packing>
         </child>
         <child>
-          <object class="GtkButton" id="_button1">
-            <property name="label" translatable="yes">Click me!</property>
+          <object class="GtkEntry" id="_inputText">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="text">192.168.1.1</property>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="_buttonScan">
+            <property name="label" translatable="yes">Scan</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="receives_default">True</property>
+            <property name="receives_default">False</property>
           </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">1</property>
+            <property name="position">2</property>
           </packing>
         </child>
       </object>

@@ -16,4 +16,8 @@
     <PackageReference Include="GtkSharp" Version="3.24.24.*" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\GvH.WebServerScanner.Library\GvH.WebServerScanner.Library.csproj" />
+  </ItemGroup>
+  
 </Project>
