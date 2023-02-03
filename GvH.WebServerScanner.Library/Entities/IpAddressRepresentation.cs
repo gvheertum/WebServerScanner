@@ -31,6 +31,17 @@
             return $"{Part1}.{Part2}.{Part3}.{Part4}";
         }
 
+        public IpAddressRepresentation AddStep(int amount)
+        {
+            return this;
+
+        }
+
+        private bool Overflows(int segment, int amountToIncrease)
+        {
+            return false;
+        }
+
         public bool IsValid()
         {
             return
