@@ -1,76 +1,33 @@
 ﻿using GvH.WebServerScanner.Library.Entities;
-using System.Net.NetworkInformation;
-using System.Net;
+using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
 
 namespace GvH.WebServerScanner.Library
 {
     public class ScanRunner
     {
-        public IpAddressScanResult PollIpAddress(IpAddressRepresentation ip, List<HttpScanParameter> scanParams)
+        private readonly ILogger<ScanRunner> logger;
+        private readonly IpScanRun ipScanRun;
+
+        public ScanRunner(ILogger<ScanRunner> logger, IpScanRun ipScanRun)
         {
-            var res = new IpAddressScanResult() { IpAddress = ip };
-            res.PingMs = PingMs(ip);
-            res.HostName = GetHostName(ip);
-            res.HttpResults = scanParams.Select(s => PerformHttpRequest(ip, s)).ToList();
-            return res;
+            this.logger = logger;
+            this.ipScanRun = ipScanRun;
         }
 
-        private int? PingMs(IpAddressRepresentation ip)
-        {
 
-            var pingReq = new Ping();
-            try
-            {
-                var reply = pingReq.Send(ip.GetRepresentation(), 500); //Ping IP address with 500ms timeout
-                return (int)reply.RoundtripTime;
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
-        }
-//TODO: If no ping do not directly go for the HTTP, this should be a flag!!
-        private string GetHostName(IpAddressRepresentation ip)
+        public IEnumerable<IpAddressScanResult> ScanAddresses(IEnumerable<IpAddressRepresentation> ipAddresses, IEnumerable<HttpScanParameter> scanParams, Action<IpAddressScanResult> retrieveAction)
         {
-            try
+            logger.LogDebug($"Scanning: {ipAddresses.Count()} ip's on {scanParams.Count()} ports: Callback? {(retrieveAction == null ? "NO" : "YES")}");
+            ConcurrentBag<IpAddressScanResult> data = new ConcurrentBag<IpAddressScanResult>();
+            Parallel.ForEach(ipAddresses, address =>
             {
-                var addr = IPAddress.Parse(ip.GetRepresentation());
-                var host = Dns.GetHostEntry(addr);
-                return host.HostName;
-            }
-            catch (Exception e)
-            {
-                return "?";
-            }
-        }
+                var res = ipScanRun.GetInstance().PollIpAddress(address, scanParams);
+                if(retrieveAction != null) { retrieveAction(res); }
+                data.Add(res);
+            });
 
-        private IpAddressHttpResult PerformHttpRequest(IpAddressRepresentation ip, HttpScanParameter parameter)
-        {
-            try
-            {
-                HttpClient cli = new HttpClient();
-                string composedUrl = $"{(parameter.Https ? "https" : "http")}://{ip.GetRepresentation()}:{parameter.Port}/";
-                Console.WriteLine("Running for:" + composedUrl);
-                var res = cli.GetAsync(composedUrl).GetAwaiter().GetResult();
-                var content = res.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                var title = ExtractTitleFromHtml(content);
-                return new IpAddressHttpResult() { Port = parameter.Port, Https = parameter.Https, FoundResult = true, BodyContent = content, Title = title };
-            }
-            catch (Exception e)
-            {
-                return new IpAddressHttpResult() { Port = parameter.Port, Https = parameter.Https, FoundResult = false, BodyContent = e.Message };
-            }
-        }
-
-        private string ExtractTitleFromHtml(string html)
-        {
-            int idxS = html.IndexOf("<title>", StringComparison.OrdinalIgnoreCase);
-            int idxE = html.IndexOf("</title>", StringComparison.OrdinalIgnoreCase);
-            if (idxS > -1 && idxE > -1)
-            {
-                return html.Substring(idxS + 7, idxE - (idxS + 7)).Trim();
-            }
-            return "No Title";
+            return data.ToList();
         }
     }
 }

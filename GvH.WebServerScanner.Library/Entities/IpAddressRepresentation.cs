@@ -10,6 +10,14 @@
             Part4 = p4;
         }
 
+        public IpAddressRepresentation(IpAddressRepresentation input)
+        {
+            Part1 = input.Part1;
+            Part2 = input.Part2;
+            Part3 = input.Part3;
+            Part4 = input.Part4;
+        }
+
         public IpAddressRepresentation(string ip)
         {
             //TODO: Hardening
@@ -21,10 +29,10 @@
             Part4 = startIP.Length >= 4 ? startIP[3] : 0;
         }
 
-        public int Part1 { get; set; }
-        public int Part2 { get; set; }
-        public int Part3 { get; set; }
-        public int Part4 { get; set; }
+        public int Part1 { get; private set; }
+        public int Part2 { get; private set; }
+        public int Part3 { get; private set; }
+        public int Part4 { get; private set; }
 
         public string GetRepresentation()
         {
@@ -33,13 +41,29 @@
 
         public IpAddressRepresentation AddStep(int amount)
         {
-            return this;
+            if(amount > 255) { throw new Exception("Not going above 255 for steps"); }
+            var newAddr = new IpAddressRepresentation(Part1, Part2, Part3, Part4);
+            newAddr.Part4 += amount;
+           
+            if(newAddr.Part4 > 255) 
+            {
+                newAddr.Part3 += 1;
+                newAddr.Part4 = newAddr.Part4 - 256; 
+            }
 
-        }
+            if (newAddr.Part3 > 255)
+            {
+                newAddr.Part2 += 1;
+                newAddr.Part3 = newAddr.Part3 - 256;
+            }
 
-        private bool Overflows(int segment, int amountToIncrease)
-        {
-            return false;
+            if (newAddr.Part2 > 255)
+            {
+                newAddr.Part1 += 1;
+                newAddr.Part2 = newAddr.Part2 - 256;
+            }
+
+            return newAddr;
         }
 
         public bool IsValid()

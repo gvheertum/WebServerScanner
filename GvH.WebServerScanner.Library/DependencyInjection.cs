@@ -17,39 +17,41 @@ namespace GvH.WebServerScanner.Library
 {
     public class DependencyInjection
     {
-        private static ServiceCollection ServiceCollection;
+        private static IServiceCollection _serviceCollection;
 
-        public ServiceCollection ConfigureDependencyInjection()
+        public IServiceCollection ConfigureDependencyInjection(IServiceCollection collection)
         {
-            ServiceCollection = new ServiceCollection();
+            collection = collection ?? new ServiceCollection();
+            _serviceCollection = collection;
 
             // Configuration
             var configuration = GetConfiguration();
 
             //Services
-            ServiceCollection.AddSingleton<IpAddressPopulator>();
-            ServiceCollection.AddSingleton<ScanRunner>();
+            _serviceCollection.AddSingleton<IpAddressPopulator>();
+            _serviceCollection.AddSingleton<ScanRunner>();
+            _serviceCollection.AddSingleton<IpScanRun>();
 
 
             // Logging
             var nlogConfiguration = new NLogLoggingConfiguration(configuration.GetSection("NLog"));
-            ServiceCollection.AddLogging(configure => configure.AddNLog(nlogConfiguration));
-            ServiceCollection.Configure<LoggerFilterOptions>(options => options.MinLevel = LogLevel.Trace);
+            _serviceCollection.AddLogging(configure => configure.AddNLog(nlogConfiguration));
+            _serviceCollection.Configure<LoggerFilterOptions>(options => options.MinLevel = LogLevel.Trace);
 
-            return ServiceCollection;
+            return _serviceCollection;
         }
 
         public static void AddTransient<TInterface, TType>()
             where TInterface : class
             where TType : class, TInterface
         {
-            ServiceCollection.AddTransient<TInterface, TType>();
+            _serviceCollection.AddTransient<TInterface, TType>();
         }
 
 
         public static IServiceProvider CreateServiceProvider()
         {
-            return ServiceCollection.BuildServiceProvider();
+            return _serviceCollection.BuildServiceProvider();
         }
 
         public static IConfigurationRoot GetConfiguration()

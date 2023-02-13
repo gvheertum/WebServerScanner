@@ -18,7 +18,7 @@ namespace GvH.WebServerScanner.Tests
             var host = new HostBuilder()
               .ConfigureServices(c =>
               {
-                  new DependencyInjection().ConfigureDependencyInjection();
+                  new DependencyInjection().ConfigureDependencyInjection(c);
               })
               .Build();
 
@@ -41,6 +41,24 @@ namespace GvH.WebServerScanner.Tests
         [Test]
         public void IPPopulator_RetrieveOverBoundary_CorrectlyReturnsNextSegmentIncrease()
         {
+            // Act
+            var range = ipAddressPopulator.PopulateRange(new IpAddressRepresentation("192.168.1.255"), new IpAddressRepresentation("192.168.2.0"));
+
+            // Assert
+            range.Should().HaveCount(2);
+            //TODO: More
+        }
+
+
+        [Test]
+        public void IPPopulator_Retrieve_YieldsCorrectData()
+        {
+            // Act
+            var range = ipAddressPopulator.PopulateRange(new IpAddressRepresentation("192.168.1.1"), new IpAddressRepresentation("192.168.1.50"));
+
+            // Assert
+            range.Should().HaveCount(50);
+            //TODO: More
         }
 
         [Test]
@@ -48,6 +66,7 @@ namespace GvH.WebServerScanner.Tests
         //Case: Reversed IP range
         public void IPPopulator_InvalidInput_YieldsNoResults()
         {
+            Assert.Fail("Not build yet");
         }
     }
 }

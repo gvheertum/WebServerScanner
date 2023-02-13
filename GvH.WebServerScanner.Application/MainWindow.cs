@@ -1,6 +1,8 @@
 using Gtk;
 using GvH.WebServerScanner.Library;
 using GvH.WebServerScanner.Library.Entities;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,6 +17,7 @@ namespace GvH.WebServerScanner.App
         [UI] private Entry _inputText = null;
 
         private int _counter;
+        private IHost host;
 
         public MainWindow() : this(new Builder("MainWindow.glade")) { }
 
@@ -24,6 +27,13 @@ namespace GvH.WebServerScanner.App
 
             DeleteEvent += Window_DeleteEvent;
             _buttonScan.Clicked += ButtonScan_Clicked;
+
+            host = new HostBuilder()
+              .ConfigureServices(c =>
+              {
+                  new DependencyInjection().ConfigureDependencyInjection(c);
+              })
+              .Build();
         }
 
         private void Window_DeleteEvent(object sender, DeleteEventArgs a)
@@ -37,7 +47,7 @@ namespace GvH.WebServerScanner.App
             _label1.Text = "Scan is clicked: " + _inputText.Text;
 
             var scanIp = new IpAddressRepresentation(_inputText.Text);
-            var scanRes = new ScanRunner().PollIpAddress(scanIp, new List<HttpScanParameter>() { 
+            var scanRes = host.Services.GetRequiredService<IpScanRun>().PollIpAddress(scanIp, new List<HttpScanParameter>() { 
                 new HttpScanParameter() { Https = false, Port = 80 },
                 new HttpScanParameter() { Https = false, Port = 8080 }
             });
