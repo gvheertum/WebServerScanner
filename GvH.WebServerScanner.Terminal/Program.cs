@@ -29,7 +29,6 @@ namespace GvH.WebServerScanner.Terminal
             }
 
             //TODO: Load a range from the params
-            //TODO: DI
             //TODO: Logging
             var ipAddressRange = host.Services.GetRequiredService<IpAddressPopulator>().PopulateRange(new IpAddressRepresentation(ipStart), new IpAddressRepresentation(ipEnd));
             Console.WriteLine($"Scanning {ipAddressRange.Count()} ip addresses");

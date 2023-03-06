@@ -18,6 +18,7 @@ namespace GvH.WebServerScanner.Library.Entities
             
             // Add from
             res.Add(new IpAddressRepresentation(curr));
+            if (!to.IsGreaterThanOrEqual(from)) { throw new FormatException("The order of the parameters is not correcty formatted"); }
 
             while (curr.GetRepresentation() != to.GetRepresentation())
             {

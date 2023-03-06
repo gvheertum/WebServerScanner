@@ -8,6 +8,8 @@
             Part2 = p2;
             Part3 = p3;
             Part4 = p4;
+
+            if (!IsValid()) { throw new FormatException($"{Part1}.{Part2}.{Part3}.{Part4} is not a valid IP address"); }
         }
 
         public IpAddressRepresentation(IpAddressRepresentation input)
@@ -16,17 +18,22 @@
             Part2 = input.Part2;
             Part3 = input.Part3;
             Part4 = input.Part4;
+
+            if (!IsValid()) { throw new FormatException($"{Part1}.{Part2}.{Part3}.{Part4} is not a valid IP address"); }
         }
 
         public IpAddressRepresentation(string ip)
         {
-            //TODO: Hardening
+            if(string.IsNullOrWhiteSpace(ip)) { throw new FormatException($"{ip} is not a valid IP address"); }
+            
             string[] startIPString = ip.Split('.');
             int[] startIP = Array.ConvertAll(startIPString, int.Parse);
             Part1 = startIP.Length >= 1 ? startIP[0] : 0;
             Part2 = startIP.Length >= 2 ? startIP[1] : 0;
             Part3 = startIP.Length >= 3 ? startIP[2] : 0;
             Part4 = startIP.Length >= 4 ? startIP[3] : 0;
+
+            if(!IsValid()) { throw new FormatException($"{ip} is not a valid IP address"); }
         }
 
         public int Part1 { get; private set; }
@@ -73,6 +80,24 @@
                 Part2 >= 0 && Part2 <= 255 &&
                 Part3 >= 0 && Part3 <= 255 &&
                 Part4 >= 0 && Part4 <= 255;
+        }
+
+
+        public bool IsGreaterThanOrEqual(IpAddressRepresentation other)
+        {
+            if(other.Part1 == Part1 && other.Part2 == Part2 && other.Part3 == Part3 && other.Part4 == Part4) { return true; }
+            return IsGreaterThan(other);
+        }
+
+        public bool IsGreaterThan(IpAddressRepresentation other)
+        {
+            if (Part1 > other.Part1) { return true; } // First node is higher
+            if (Part1 == other.Part1 && Part2 > other.Part2) { return true; } // Second node higher
+            if (Part1 == other.Part1 && Part2 == other.Part2 && Part3 > other.Part3) { return true; } //Third higher
+            if (Part1 == other.Part1 && Part2 == other.Part2 && Part3 == other.Part3 && Part4 > other.Part4) { return true; } // Fourth higher
+
+            // Others are lower, so false
+            return false;
         }
     }
 }
